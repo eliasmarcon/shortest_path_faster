@@ -1,7 +1,7 @@
 /**
     Author: Clemens Wondrak
 **/
-#include "../include/Graph.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,13 +36,14 @@ void insertEdge(int* row, int max, int newEdge)
 }
 
 
-int generateRandomConnectedNetwork(int numNodes, int insertConnections, int **index, int **edges) {
+void generateRandomConnectedNetwork(int numNodes, int insertConnections, int **index, int **edges) {
     if (numNodes < 2) {
         // A connected network is not possible with less than 2 nodes.
         *index = NULL;
         *edges = NULL;
-        return 0;
+        return;
     }
+
     srand(time(NULL));   // Initialization, should only be called once.
 
     //prepare 2d array for inital graph generation
@@ -73,9 +74,9 @@ int generateRandomConnectedNetwork(int numNodes, int insertConnections, int **in
     }
 
     //transform graph into mpi readable arrays
+    *index = (int *)malloc((numNodes + 1) * sizeof(int));
     *edges = (int *)malloc(edgeCounter * sizeof(int));
-    *index = (int *)malloc(numNodes * sizeof(int));
-    int edgeCounter2 = edgeCounter;
+
     edgeCounter = 0;
     for (int currentIndex = 0; currentIndex < numNodes; currentIndex++)
     {
@@ -88,14 +89,12 @@ int generateRandomConnectedNetwork(int numNodes, int insertConnections, int **in
         (*index)[currentIndex] = edgeCounter;
     }
 
-
     //freeing the blue print
     for (int currentNode = 0; currentNode < numNodes; currentNode++)
     {
         free(graphBluePrint[currentNode]);
     }
     free(graphBluePrint);
-    return edgeCounter2;
 }
 
 
@@ -122,13 +121,13 @@ void printGraph(int numNodes, int *index, int *edges) {
     }
 }
 
-/*Example usage
+// Example usage
 int main() {
     int numNodes = 10;
      int *index = NULL;
     int *edges = NULL;
 
-    generateRandomConnectedNetwork(numNodes, (int)((numNodes/3)+1), &index, &edges);
+    generateRandomConnectedNetwork(numNodes, 1, &index, &edges);
     printGraph(numNodes, index, edges);
 
     free(index);
@@ -136,4 +135,3 @@ int main() {
 
     return 0;
 }
-*/

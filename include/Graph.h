@@ -10,15 +10,8 @@ struct Edge
     int weight;
 };
 
-struct Graph
-{
-    int nodeAmount;
-    int *index;
-    int *edges_array;
-};
 
-struct Graph *getGraph(int nodes);
-void generateBinaryTree(int, int **index, int **edges_array);
-void printGraph(struct Graph *graph);
+int generateRandomConnectedNetwork(int numNodes, int insertConnections, int **index, int **edges);
+void printGraph(int numNodes, int *index, int *edges);
 
 #endif // graph_h

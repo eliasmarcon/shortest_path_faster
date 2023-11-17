@@ -25,7 +25,7 @@ void spf(MPI_Comm *graph_comm, bool beginner_node){
 
     // n -1 rounds
     int *recData = start_recieving(graph_comm, request);
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < n-1; i++){
         //start recieving with MPI_Irecv
         
 
@@ -104,7 +104,7 @@ void wait_for_timeout_and_process_result(MPI_Comm *graph_comm, MPI_Request **req
                 dist = recData[i] + edges[i]->weight;
                 parent = edges[i]->neighbor;
                 if(DEBUG)
-                    printf("Rank: %d, New parent: %d, New distance: %d\n", rank, parent, dist);
+                    printf("Rank: %d, New parent: %d, New distance to 0: %d\n", rank, parent ,dist);
             }
             MPI_Irecv(&recData[i], 1, MPI_INT, edges[i]->neighbor, 0, *graph_comm, request[i]);
         }
@@ -139,57 +139,72 @@ int main(int argc, char *argv[])
         timeOutSecs = STANDARD_TIMEOUT;
     }
     
-    int id_beginner_node = 0;
-    struct Graph *graph = getGraph(n);
-    MPI_Comm graph_comm;
-    MPI_Graph_create(MPI_COMM_WORLD, graph->nodeAmount, (graph->index), (graph->edges_array), 0, &graph_comm);
+    int id_beginner_node = 0;    
+    int edgeCount = 0;
+    int *index = NULL;
+    int *edgesArray = NULL;
+    if(rank == 0){
 
+        edgeCount = generateRandomConnectedNetwork(n, (int)((n/3)+1), &index, &edgesArray);
+        printGraph(n, index, edgesArray);
+
+    }
+    MPI_Bcast(&edgeCount, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    if(rank != 0){
+        index = malloc(n * sizeof(int));
+        edgesArray = malloc(edgeCount * sizeof(int));
+    }
+    MPI_Bcast(edgesArray, edgeCount, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(index, n, MPI_INT, 0, MPI_COMM_WORLD);
+
+
+
+    MPI_Comm graph_comm;
+    MPI_Graph_create(MPI_COMM_WORLD, n, index, edgesArray, 0, &graph_comm);
+    free(index);
+    free(edgesArray);
     if(rank == id_beginner_node){
         dist = 0;
     }
 
     init_neighbors(&graph_comm);
     spf(&graph_comm, (rank == id_beginner_node));
-
+    sleep(1);
     //print stuff
     //for n -1 rounds
         // only recieve from parent
         // send print command to all nodes
         // if print command recieved: print node + distance
-    /*
+    
     int depth;
-    for(int i = 0; i < n; i++){
-        if(rank == id_beginner_node){
-            depth = 0;
-        }
-        else{
-            MPI_Recv(&depth, 1, MPI_INT, parent, 0, graph_comm, MPI_STATUS_IGNORE);
-        }
-        for (int i = 0; i < depth; i++)
-        {
-            printf("    ");
-        }
-        //print node + distance
-        //printf("Node: %d, Distance: %d\n", rank, dist);
-        if (depth > 0)
-        {
-            //printf(isLast ? "└── " : "|── ");
-            printf("└── ");
-        }
-
-        printf("Rank: %d, Distance: (%d)\n", rank, dist);
-        
-        //send print command
-        depth++;
-        for(int i = 0; i < n_neighbors; i++){
-            MPI_Send(&depth, 1, MPI_INT, edges[i]->neighbor, 0, graph_comm);      
-        }
+    if(rank == id_beginner_node){
+        depth = 0;
     }
-    */
-    free(edges);
+    else{
+        printf("Rank: %d, Waiting for parent: %d\n", rank, parent);
+        MPI_Recv(&depth, 1, MPI_INT, parent, 0, graph_comm, MPI_STATUS_IGNORE);
+    }
+    for (int i = 0; i < depth; i++)
+    {
+        printf("    ");
+    }
+    //print node + distance
+    //printf("Node: %d, Distance: %d\n", rank, dist);
+    if (depth > 0)
+    {
+        //printf(isLast ? "└── " : "|── ");
+        printf("└── ");
+    }
+
+    printf("Rank: %d, Distance: (%d)\n", rank, dist);
+    
+    //send print command
+    depth++;
+    for(int i = 0; i < n_neighbors; i++){
+        MPI_Send(&depth, 1, MPI_INT, edges[i]->neighbor, 0, graph_comm);      
+    }
     MPI_Comm_free(&graph_comm);
-    free(graph->index);
-    free(graph->edges_array);
+    free(edges);
     MPI_Finalize();
 
     return 0;
