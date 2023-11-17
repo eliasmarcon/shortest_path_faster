@@ -1,6 +1,7 @@
 #include "distributed_spf.h"
 #include <stdbool.h>
 #include <mpi.h>
+int rank, size;
 
 /**
  * @brief The main function of the program.
