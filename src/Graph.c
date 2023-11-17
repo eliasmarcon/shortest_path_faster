@@ -109,31 +109,15 @@ void printGraph(int numNodes, int *index, int *edges) {
 
     printf("Graph representation (Adjacency List):\n");
     for (int i = 0; i < numNodes; i++) {
-        printf("Node %d: ", i);
+        printf("\tNode %2d: ", i);
         int start = 0;
         if ( i > 0)
         {
             start = index[i- 1];
         }
         for (int j = start; j < index[i]; j++) {
-            printf("%d ", edges[j]);
+            printf("  %2d ", edges[j]);
         }
         printf("\n");
     }
 }
-
-/*Example usage
-int main() {
-    int numNodes = 10;
-     int *index = NULL;
-    int *edges = NULL;
-
-    generateRandomConnectedNetwork(numNodes, (int)((numNodes/3)+1), &index, &edges);
-    printGraph(numNodes, index, edges);
-
-    free(index);
-    free(edges);
-
-    return 0;
-}
-*/

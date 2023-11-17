@@ -17,11 +17,7 @@ $(OUTDIR):
 all: ${EXECS}
 
 mpi_spf: $(OUTDIR) $(SRC)
-	${MPICC} -I$(INCLUDEDIR) -o $(OUTDIR)/$@ $(SRC)
-
-mpi_graph: 
-	${MPICC} -o $(OUTDIR)/mpi_graph src/Graph.c
-
+	${MPICC} -I$(INCLUDEDIR) -o $(OUTDIR)/$@ $(SRC) -lm
 
 clean:
 	rm -f $(OUTDIR)/*

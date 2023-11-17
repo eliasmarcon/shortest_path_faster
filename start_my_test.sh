@@ -1,2 +1,2 @@
 make all
-mpirun -np 5 ./out/mpi_spf
+mpirun -np 14 ./out/mpi_spf

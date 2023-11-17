@@ -1,4 +1,4 @@
-#include "distributed_spf.h"
+#include <math.h>
 #include "Graph.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,8 +6,10 @@
 #include <time.h>
 #include <limits.h>
 
-#define STANDARD_TIMEOUT 2
-#define DEBUG 1
+#include "distributed_spf.h"
+
+#define STANDARD_TIMEOUT 1
+#define DEBUG 0
 #define VERBOSE 0
 
 int calls = 0;
@@ -24,17 +26,18 @@ void spf(MPI_Comm *graph_comm, bool beginner_node){
     MPI_Request **request = malloc(n_neighbors * sizeof(MPI_Request *));;
 
     // n -1 rounds
+    //int oldDist = 0;
     int *recData = start_recieving(graph_comm, request);
     for(int i = 0; i < n-1; i++){
         //start recieving with MPI_Irecv
         
 
         //only send if we got a distance smaller than INT_MAX
-        if(dist != INT_MAX){
+        if(dist != INT_MAX /*&& dist != oldDist*/){
             // each round, each node sends its distance to its neighbors
             send_dist_to_neighbors(graph_comm, dist);
         }
-
+        //oldDist = dist;
         //wait for timeout and check if something was recieved
         wait_for_timeout_and_process_result(graph_comm, request, recData);
     }
@@ -43,7 +46,8 @@ void spf(MPI_Comm *graph_comm, bool beginner_node){
 }
 
 int calc_weight(int node1, int node2){
-    //TODO: implement ping
+    // pseduo metric for lab environment
+    // Ensures that all Nodes have a shared value for each edges weight
     return (int)((node1 + node2)/2)+1;
 }
 
@@ -100,7 +104,7 @@ void wait_for_timeout_and_process_result(MPI_Comm *graph_comm, MPI_Request **req
         MPI_Test(request[i], &flag[i], &status[i]);
         if(flag[i]){
             //process result
-            if((dist == INT_MAX) || (recData[i] < (dist + edges[i]->weight))){
+            if((dist == INT_MAX) || ((recData[i] + edges[i]->weight) < dist)){
                 dist = recData[i] + edges[i]->weight;
                 parent = edges[i]->neighbor;
                 if(DEBUG)
@@ -144,8 +148,15 @@ int main(int argc, char *argv[])
     int *index = NULL;
     int *edgesArray = NULL;
     if(rank == 0){
-
-        edgeCount = generateRandomConnectedNetwork(n, (int)((n/3)+1), &index, &edgesArray);
+        int branchingFactor = (int)(log(n) + 1);
+        edgeCount = generateRandomConnectedNetwork(n, branchingFactor, &index, &edgesArray);
+        
+        printf("==================== Output ====================\n");
+        printf("Branching Factor: %d\n", branchingFactor);
+        printf("Number of nodes: %d\n", n);
+        printf("Number of edges: %d\n", edgeCount);
+        printf("Timeout: %d\n", timeOutSecs);
+        printf("================================================\n");
         printGraph(n, index, edgesArray);
 
     }
@@ -169,41 +180,28 @@ int main(int argc, char *argv[])
 
     init_neighbors(&graph_comm);
     spf(&graph_comm, (rank == id_beginner_node));
-    sleep(1);
-    //print stuff
-    //for n -1 rounds
-        // only recieve from parent
-        // send print command to all nodes
-        // if print command recieved: print node + distance
-    
-    int depth;
-    if(rank == id_beginner_node){
-        depth = 0;
-    }
-    else{
-        printf("Rank: %d, Waiting for parent: %d\n", rank, parent);
-        MPI_Recv(&depth, 1, MPI_INT, parent, 0, graph_comm, MPI_STATUS_IGNORE);
-    }
-    for (int i = 0; i < depth; i++)
-    {
-        printf("    ");
-    }
-    //print node + distance
-    //printf("Node: %d, Distance: %d\n", rank, dist);
-    if (depth > 0)
-    {
-        //printf(isLast ? "└── " : "|── ");
-        printf("└── ");
-    }
 
-    printf("Rank: %d, Distance: (%d)\n", rank, dist);
-    
-    //send print command
-    depth++;
-    for(int i = 0; i < n_neighbors; i++){
-        MPI_Send(&depth, 1, MPI_INT, edges[i]->neighbor, 0, graph_comm);      
+    int sumCalls = 0;
+    MPI_Reduce(&calls, &sumCalls, 1, MPI_INT, MPI_SUM, id_beginner_node, MPI_COMM_WORLD);
+    if(rank == id_beginner_node){
+        printf("================================================\n");
+        printf("Total Messages: %d\n", sumCalls);
+        printf("Remark: parent -1 means no parent\n");
+        printf("Result of SPF:\n");
+    }
+    MPI_Request *barrier = malloc(sizeof(MPI_Request));
+    //MPI_Status *status = malloc(sizeof(MPI_Status));
+    MPI_Ibarrier(MPI_COMM_WORLD, barrier);
+    MPI_Wait(barrier, MPI_STATUS_IGNORE);
+    printf("\tRank: %2d, Parent: %2d, Distance to root: %2d\n", rank, parent, dist);
+    MPI_Ibarrier(MPI_COMM_WORLD, barrier);
+    MPI_Wait(barrier, MPI_STATUS_IGNORE);
+
+    if(rank == id_beginner_node){
+        printf("================================================\n");
     }
     MPI_Comm_free(&graph_comm);
+    free(barrier);
     free(edges);
     MPI_Finalize();
 
