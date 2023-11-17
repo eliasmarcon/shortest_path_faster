@@ -1,6 +1,6 @@
 {
     "editor.wordWrap": "on",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "liveshare.languages.allowGuestCommandControl": true,
     "todo-tree.general.tags": [
         "BUG",

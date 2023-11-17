@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct Edge
+{
+    int neighbor;
+    int weight;
+};
+
 struct Graph
 {
     int nodeAmount;
@@ -12,5 +18,7 @@ struct Graph
 };
 
 struct Graph *getGraph(int nodes);
+void generateBinaryTree(int, int **index, int **edges_array);
+void printGraph(struct Graph *graph);
 
 #endif // graph_h
