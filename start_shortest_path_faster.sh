@@ -14,6 +14,9 @@ num_tasks=${2:-5}
 output_file="./shortest_path_faster_result.txt"
 temp_file="./temp_output.txt"
 
+# Ensure file is created
+touch "$output_file"
+
 # Run the program and store the output in the temporary file
 if [ "$run_type" == "cluster" ]; then
     # Running on the Slurm cluster
