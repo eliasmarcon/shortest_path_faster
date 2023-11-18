@@ -1,5 +1,58 @@
 ==================== Output ========================
 Branching Factor: 3
+Number of nodes: 20
+Number of edges: 90
+Timeout: 1
+====================================================
+Graph representation (Adjacency List):
+	Node  0:    1    2    3    4    6    8 
+	Node  1:    0    2    4    5    6    9 
+	Node  2:    1    0    3    7   17 
+	Node  3:    0    2   10   12   15   18 
+	Node  4:    1    0   10   13   19 
+	Node  5:    1    7    8   12   16 
+	Node  6:    0    1    9   11   15 
+	Node  7:    2    5    9   14 
+	Node  8:    5    0   13   16   18 
+	Node  9:    1    7    6   10   11 
+	Node 10:    4    9    3   11   17 
+	Node 11:    9   10    6   12   19 
+	Node 12:    3    5   11   14   16 
+	Node 13:    4    8   15   19 
+	Node 14:    7   12 
+	Node 15:    6   13    3   17 
+	Node 16:    8   12    5 
+	Node 17:   15   10    2   18 
+	Node 18:    3    8   17 
+	Node 19:   13    4   11 
+====================================================
+Total Messages: 1268
+Remark: parent -1 means no parent
+Result of SPF:
+	Rank:  0, Parent: -1, Distance to root:  0
+	Rank:  8, Parent:  0, Distance to root:  5
+	Rank:  2, Parent:  0, Distance to root:  2
+	Rank:  6, Parent:  0, Distance to root:  4
+	Rank:  3, Parent:  0, Distance to root:  2
+	Rank: 16, Parent:  5, Distance to root: 16
+	Rank: 18, Parent:  3, Distance to root: 13
+	Rank: 11, Parent:  6, Distance to root: 13
+	Rank: 12, Parent:  3, Distance to root: 10
+	Rank:  5, Parent:  1, Distance to root:  5
+	Rank: 17, Parent:  2, Distance to root: 12
+	Rank: 13, Parent:  4, Distance to root: 12
+	Rank:  9, Parent:  1, Distance to root:  7
+	Rank:  1, Parent:  0, Distance to root:  1
+	Rank: 14, Parent:  7, Distance to root: 18
+	Rank:  7, Parent:  2, Distance to root:  7
+	Rank:  4, Parent:  0, Distance to root:  3
+	Rank: 15, Parent:  3, Distance to root: 12
+	Rank: 19, Parent:  4, Distance to root: 15
+	Rank: 10, Parent:  3, Distance to root:  9
+====================================================
+
+==================== Output ========================
+Branching Factor: 3
 Number of nodes: 15
 Number of edges: 70
 Timeout: 1
@@ -38,9 +91,9 @@ Result of SPF:
 	Rank:  3, Parent:  0, Distance to root:  2
 	Rank:  0, Parent: -1, Distance to root:  0
 	Rank: 14, Parent:  6, Distance to root: 15
+	Rank:  7, Parent:  1, Distance to root:  6
 ====================================================
 
-	Rank:  7, Parent:  1, Distance to root:  6
 ==================== Output ========================
 Branching Factor: 3
 Number of nodes: 10
