@@ -151,12 +151,12 @@ int main(int argc, char *argv[])
         int branchingFactor = (int)(log(n) + 1);
         edgeCount = generateRandomConnectedNetwork(n, branchingFactor, &index, &edgesArray);
         
-        printf("==================== Output ====================\n");
+        printf("==================== Output ========================\n");
         printf("Branching Factor: %d\n", branchingFactor);
         printf("Number of nodes: %d\n", n);
         printf("Number of edges: %d\n", edgeCount);
         printf("Timeout: %d\n", timeOutSecs);
-        printf("================================================\n");
+        printf("====================================================\n");
         printGraph(n, index, edgesArray);
 
     }
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
     int sumCalls = 0;
     MPI_Reduce(&calls, &sumCalls, 1, MPI_INT, MPI_SUM, id_beginner_node, MPI_COMM_WORLD);
     if(rank == id_beginner_node){
-        printf("================================================\n");
+        printf("====================================================\n");
         printf("Total Messages: %d\n", sumCalls);
         printf("Remark: parent -1 means no parent\n");
         printf("Result of SPF:\n");
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
     MPI_Wait(barrier, MPI_STATUS_IGNORE);
 
     if(rank == id_beginner_node){
-        printf("================================================\n");
+        printf("====================================================\n\n");
     }
     MPI_Comm_free(&graph_comm);
     free(barrier);

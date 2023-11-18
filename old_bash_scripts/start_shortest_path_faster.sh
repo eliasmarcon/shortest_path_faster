@@ -12,32 +12,32 @@ num_tasks=${2:-5}
 
 # Output file to save results
 output_file="./shortest_path_faster_result.txt"
-temp_file="./temp_output.txt"
 
-# Run the program and store the output in the temporary file
+#clear the output file
+> $output_file
+
 if [ "$run_type" == "cluster" ]; then
+    
     # Running on the Slurm cluster
     echo "Running on the Slurm cluster..."
     echo "Running Shortest Path Faster (SPFA) with $num_tasks MPI tasks..."
-    srun -n $num_tasks --mpi=pmi2 ./out/mpi_spf > $temp_file
+    srun -n $num_tasks --mpi=pmi2 ~/dev/spf/mpi_spf $max_tree_depth >> $output_file
+
 elif [ "$run_type" == "local" ]; then
+    
     make all
+    
     # Running locally
     echo "Running locally..."
     echo "Running Shortest Path Faster (SPFA) with $num_tasks MPI tasks..."
-    mpirun -np $num_tasks ./out/mpi_spf > $temp_file
+    mpirun -np $num_tasks ./out/mpi_spf $max_tree_depth >> $output_file
+
 else
     echo "Invalid run type. Use 'local' or 'cluster'."
     exit 1
 fi
 
-# Prepend the latest output to the existing content of the output file
-cat "$temp_file" "$output_file" > "$output_file.tmp" && mv "$output_file.tmp" "$output_file"
-
-# Show the result of the run in the command line
-cat $temp_file
-
-# Remove the temporary file
-rm -f "$temp_file"
+# show the result of the run in the command line
+cat $output_file
 
 echo "Completed."

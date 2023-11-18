@@ -5,7 +5,7 @@ Finds the shortest path between two nodes in a graph using the shortest-path-fas
 
 - do not send messages when the distance is not infinity
 
-### Possible optimizations
+### Possible further optimizations
 - only send messages when the distance is smaller than the current distance
 
 
@@ -26,7 +26,7 @@ Finds the shortest path between two nodes in a graph using the shortest-path-fas
 
 - `./src`:
 
-  - `distributed_spf.c`: 
+  - `distributed_spf.c`: initializes a distributed graph and performs a parallel implementation of the Shortest-Path-Faster Algorithm (SPFA) algorithm using MPI, where each process represents a node in the graph, and communication occurs between neighboring nodes to calculate the shortest path from a designated root node to all other nodes, with additional features such as timeout handling and message counting
 
   - `Graph.c`: defines functions to create and print a binary tree-based graph with a specified number of nodes, including memory allocation checks and edge generation based on the binary tree structure
 
@@ -36,7 +36,7 @@ Finds the shortest path between two nodes in a graph using the shortest-path-fas
 
 - `start_shortest_path_faster.sh`: automates the execution of the `make all` command and MPI program (shortest-path-faster) with a user-specified number of processes and max depth (saves the results of the run in the output file `distributed_bfs_results.txt` for monitoring and analysis)
 
-- `shortest_path_faster_result.txt`: contains the results of the most recent run
+- `shortest_path_faster_result.txt`: contains the results of all runs with the latest run on top
 
 ## How to build
 
@@ -47,7 +47,7 @@ Finds the shortest path between two nodes in a graph using the shortest-path-fas
 
 ### Build
 
-- the `make all` command is included in the `start_shortest_path_faster.sh` file
+- the `make all` command is included in the `start_shortest_path_faster.sh` file for the local run
 
 ### Usage
 
@@ -72,11 +72,13 @@ To use the provided Bash script for running the distributed breadth-first search
 
 ```
 
+## Example Graph with 5 Nodes/Processes
+
 ```mermaid
 graph LR
-0----1----3----4----10----11----18----22----28 
-0----2----3----4----5----7----9----16----18----29 
-1----4----5----6----7----8----10----11----20 
-1----0----5----8----11----13----15----20----33 
-1----0----2----5----12----14----16----26----27 
+0----1----2----3 
+1----0----2----4 
+2----0----1----3 
+3----2----0----4 
+4----1----3 
 ```
